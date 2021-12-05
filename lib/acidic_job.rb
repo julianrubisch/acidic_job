@@ -2,7 +2,6 @@
 
 require_relative "acidic_job/version"
 require_relative "acidic_job/errors"
-require_relative "acidic_job/no_op"
 require_relative "acidic_job/recovery_point"
 require_relative "acidic_job/response"
 require_relative "acidic_job/key"
@@ -269,11 +268,10 @@ module AcidicJob
     current_step = step["does"]
     next_step = step["then"]
 
-    callable = if respond_to? current_step, _include_private = true
+    callable = respond_to?(current_step, _include_private = true) ?
                  method(current_step)
-               else
+               :
                  proc {} # no-op
-               end
 
     proc do |key|
       result = if callable.arity.zero?

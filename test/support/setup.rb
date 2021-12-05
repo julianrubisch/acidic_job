@@ -29,6 +29,7 @@ ActiveRecord::Schema.define do
     t.text :error_object
     t.text :attr_accessors
     t.text :workflow
+    t.text :serialized_job, null: true
     t.timestamps
 
     t.index %i[idempotency_key job_name job_args], unique: true,

@@ -119,7 +119,7 @@ end
 
 **Note:** This does mean that you are restricted to objects that can be serialized by ActiveRecord, thus no Procs, for example.
 
-**Note:** You will note the use of `self.ride = ...` in the code sample above. In order to call the attribute setter method that will sync with the database record, you _must_ use this style. `@ride = ...` and/or `ride = ...` will both fail to sync the value with the datbase record.
+**Note:** You will note the use of `self.ride = ...` in the code sample above. In order to call the attribute setter method that will sync with the database record, you _must_ use this style. `@ride = ...` and/or `ride = ...` will both fail to sync the value with the database record.
 
 ### Transactionally Staged Jobs
 
