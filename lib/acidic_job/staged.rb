@@ -33,10 +33,7 @@ module AcidicJob
         job = ActiveJob::Base.deserialize(job_args)
         job.enqueue
       when "sidekiq"
-        Sidekiq::Client.push(
-          "class" => job_name,
-          "args" => job_args
-        )
+        job_name.constantize.perform_async(*job_args)
       else
         raise UnknownJobAdapter.new(adapter: adapter)
       end
