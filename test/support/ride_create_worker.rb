@@ -36,7 +36,7 @@ class RideCreateWorker
       user: user
     )
 
-    raise SimulatedTestingFailure if defined?(error_in_create_ride) && error_in_create_ride
+    raise SimulatedTestingFailure if self.class.instance_variable_get(:@error_in_create_ride)
 
     # in the same transaction insert an audit record for what happened
     Audit.create!(
@@ -49,7 +49,7 @@ class RideCreateWorker
   # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
   def create_stripe_charge
-    raise SimulatedTestingFailure if defined?(error_in_create_stripe_charge) && error_in_create_stripe_charge
+    raise SimulatedTestingFailure if self.class.instance_variable_get(:@error_in_create_stripe_charge)
 
     begin
       charge = Stripe::Charge.create({
@@ -61,7 +61,7 @@ class RideCreateWorker
         # Pass through our own unique ID rather than the value
         # transmitted to us so that we can guarantee uniqueness to Stripe
         # across all Rocket Rides accounts.
-        idempotency_key: "rocket-rides-atomic-#{idempotency_key}"
+        idempotency_key: "rocket-rides-atomic-#{key}"
       })
     rescue Stripe::CardError
       # Short circuits execution by sending execution right to 'finished'.
