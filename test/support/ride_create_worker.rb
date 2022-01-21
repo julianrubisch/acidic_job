@@ -17,7 +17,7 @@ class RideCreateWorker
 
   def perform(user_id, ride_params)
     user = User.find(user_id)
-    with_acidity given: { user: user, params: ride_params, ride: nil } do
+    with_acidity given: {user: user, params: ride_params, ride: nil} do
       step :create_ride_and_audit_record
       step :create_stripe_charge
       step :send_receipt
@@ -26,7 +26,6 @@ class RideCreateWorker
 
   private
 
-  # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
   def create_ride_and_audit_record
     self.ride = Ride.create!(
       origin_lat: params["origin_lat"],
@@ -49,22 +48,21 @@ class RideCreateWorker
   end
   # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
-  # rubocop:disable Metrics/MethodLength
   def create_stripe_charge
     raise SimulatedTestingFailure if defined?(error_in_create_stripe_charge) && error_in_create_stripe_charge
 
     begin
       charge = Stripe::Charge.create({
-                                       amount: 20_00,
-                                       currency: "usd",
-                                       customer: user.stripe_customer_id,
-                                       description: "Charge for ride #{ride.id}"
-                                     }, {
-                                       # Pass through our own unique ID rather than the value
-                                       # transmitted to us so that we can guarantee uniqueness to Stripe
-                                       # across all Rocket Rides accounts.
-                                       idempotency_key: "rocket-rides-atomic-#{key.id}"
-                                     })
+        amount: 20_00,
+        currency: "usd",
+        customer: user.stripe_customer_id,
+        description: "Charge for ride #{ride.id}"
+      }, {
+        # Pass through our own unique ID rather than the value
+        # transmitted to us so that we can guarantee uniqueness to Stripe
+        # across all Rocket Rides accounts.
+        idempotency_key: "rocket-rides-atomic-#{idempotency_key}"
+      })
     rescue Stripe::CardError
       # Short circuits execution by sending execution right to 'finished'.
       # So, ends the job "successfully"

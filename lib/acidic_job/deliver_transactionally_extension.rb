@@ -2,7 +2,6 @@
 
 module AcidicJob
   module DeliverTransactionallyExtension
-    # rubocop:disable Metrics/MethodLength
     def deliver_transactionally(_options = {})
       job = delivery_job_class
 
@@ -12,10 +11,10 @@ module AcidicJob
       }
 
       job_args = if job <= ActionMailer::Parameterized::MailDeliveryJob
-                   [@mailer_class.name, @action.to_s, "deliver_now", { params: @params, args: @args }]
-                 else
-                   [@mailer_class.name, @action.to_s, "deliver_now", @params, *@args]
-                 end
+        [@mailer_class.name, @action.to_s, "deliver_now", {params: @params, args: @args}]
+      else
+        [@mailer_class.name, @action.to_s, "deliver_now", @params, *@args]
+      end
 
       attributes[:job_args] = job.new(job_args).serialize
 

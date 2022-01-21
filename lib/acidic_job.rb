@@ -12,7 +12,6 @@ require_relative "acidic_job/deliver_transactionally_extension"
 require_relative "acidic_job/sidekiq_callbacks"
 require "active_support/concern"
 
-# rubocop:disable Metrics/ModuleLength, Metrics/AbcSize, Metrics/MethodLength
 module AcidicJob
   extend ActiveSupport::Concern
 
@@ -80,11 +79,11 @@ module AcidicJob
     # begin the workflow
     process_key(key)
   end
-  
+
   # DEPRECATED
   def idempotently(with:, &blk)
     with_acidity(given: with, &blk)
-  end 
+  end
 
   def process_key(key)
     @key = key
@@ -97,7 +96,7 @@ module AcidicJob
       recovery_point = @key.recovery_point.to_s
       current_step = @key.workflow[recovery_point]
 
-      if recovery_point == Key::RECOVERY_POINT_FINISHED.to_s # rubocop:disable Style/GuardClause
+      if recovery_point == Key::RECOVERY_POINT_FINISHED.to_s
         break
       elsif current_step.nil?
         raise UnknownRecoveryPoint, "Defined workflow does not reference this step: #{recovery_point}"
@@ -151,7 +150,7 @@ module AcidicJob
   end
 
   def define_workflow(steps)
-    steps << { "does" => Key::RECOVERY_POINT_FINISHED }
+    steps << {"does" => Key::RECOVERY_POINT_FINISHED}
 
     {}.tap do |workflow|
       steps.each_cons(2).map do |enter_step, exit_step|
@@ -169,7 +168,7 @@ module AcidicJob
                         :read_uncommitted
                       else
                         :serializable
-                      end
+    end
 
     ActiveRecord::Base.transaction(isolation: isolation_level) do
       key = Key.find_by(idempotency_key: key_val)
@@ -218,7 +217,7 @@ module AcidicJob
         step_result.call(key: key)
       end
     # QUESTION: Can an error not inherit from StandardError
-    rescue StandardError => e
+    rescue => e
       rescued_error = e
       raise e
     ensure
@@ -227,7 +226,7 @@ module AcidicJob
         # key right away so that another request can try again.3
         begin
           key.update_columns(locked_at: nil, error_object: rescued_error)
-        rescue StandardError => e
+        rescue => e
           # We're already inside an error condition, so swallow any additional
           # errors from here and just send them to logs.
           puts "Failed to unlock key #{key.id} because of #{e}."
@@ -262,7 +261,6 @@ module AcidicJob
     true
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity
   def wrap_step_as_acidic_callable(step)
     # {:then=>:next_step, :does=>:enqueue_step, :awaits=>[WorkerWithEnqueueStep::FirstWorker]}
     current_step = step["does"]
@@ -275,12 +273,12 @@ module AcidicJob
 
     proc do |key|
       result = if callable.arity.zero?
-                 callable.call
-               elsif callable.arity == 1
-                 callable.call(key)
-               else
-                 raise TooManyParametersForStepMethod
-               end
+        callable.call
+      elsif callable.arity == 1
+        callable.call(key)
+      else
+        raise TooManyParametersForStepMethod
+      end
 
       if result.is_a?(Response)
         result
@@ -305,7 +303,7 @@ module AcidicJob
         :success,
         "#{self.class.name}#step_done",
         # NOTE: options are marshalled through JSON so use only basic types.
-        { "key_id" => @key.id }
+        {"key_id" => @key.id}
       )
       # NOTE: The jobs method is atomic.
       # All jobs created in the block are actually pushed atomically at the end of the block.

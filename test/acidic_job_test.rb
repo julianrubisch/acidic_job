@@ -4,7 +4,6 @@ require "test_helper"
 require_relative "support/setup"
 require_relative "support/ride_create_job"
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength
 class TestAcidicJobs < Minitest::Test
   include ActiveJob::TestHelper
 
@@ -17,8 +16,7 @@ class TestAcidicJobs < Minitest::Test
     }.freeze
     @valid_user = User.find_by(stripe_customer_id: "tok_visa")
     @invalid_user = User.find_by(stripe_customer_id: "tok_chargeCustomerFail")
-    @staged_job_params = { amount: 20_00, currency: "usd", user: @valid_user }
-    # rubocop:disable Style/GuardClause
+    @staged_job_params = {amount: 20_00, currency: "usd", user: @valid_user}
     if RideCreateJob.respond_to?(:error_in_create_stripe_charge)
       RideCreateJob.undef_method(:error_in_create_stripe_charge)
     end
@@ -166,14 +164,14 @@ class TestAcidicJobs < Minitest::Test
       assert_equal 1, Audit.count
       assert_equal 0, AcidicJob::Staged.count
       assert_equal key.attr_accessors,
-                   { "user" => @valid_user, "params" => @valid_params, "ride" => Ride.first }
+        {"user" => @valid_user, "params" => @valid_params, "ride" => Ride.first}
     end
 
     def test_continues_from_recovery_point_create_stripe_charge
       ride = Ride.create(@valid_params.merge(
-                           user: @valid_user
-                         ))
-      key = create_key(recovery_point: :create_stripe_charge, attr_accessors: { ride: ride })
+        user: @valid_user
+      ))
+      key = create_key(recovery_point: :create_stripe_charge, attr_accessors: {ride: ride})
       AcidicJob::Key.stub(:find_by, ->(*) { key }) do
         assert_performed_with(job: SendRideReceiptJob) do
           result = RideCreateJob.perform_now(@valid_user, @valid_params)
@@ -188,7 +186,7 @@ class TestAcidicJobs < Minitest::Test
       assert_equal 0, Audit.count
       assert_equal 0, AcidicJob::Staged.count
       assert_equal key.attr_accessors,
-                   { "user" => @valid_user, "params" => @valid_params, "ride" => Ride.first }
+        {"user" => @valid_user, "params" => @valid_params, "ride" => Ride.first}
     end
 
     def test_continues_from_recovery_point_send_receipt
@@ -207,7 +205,7 @@ class TestAcidicJobs < Minitest::Test
       assert_equal 0, Audit.count
       assert_equal 0, AcidicJob::Staged.count
       assert_equal key.attr_accessors,
-                   { "user" => @valid_user, "params" => @valid_params, "ride" => nil }
+        {"user" => @valid_user, "params" => @valid_params, "ride" => nil}
     end
 
     def test_halts_execution_of_steps_when_safely_finish_acidic_job_returned
@@ -226,7 +224,7 @@ class TestAcidicJobs < Minitest::Test
       assert_equal 0, Audit.count
       assert_equal 0, AcidicJob::Staged.count
       assert_equal key.attr_accessors,
-                   { "user" => @valid_user, "params" => @valid_params, "ride" => nil }
+        {"user" => @valid_user, "params" => @valid_params, "ride" => nil}
     end
   end
 

@@ -6,7 +6,6 @@ require "sidekiq/testing"
 require_relative "support/setup"
 require_relative "support/ride_create_worker"
 
-# rubocop:disable Metrics/AbcSize, Metrics/MethodLength
 class TestAcidicWorkers < Minitest::Test
   def setup
     @valid_params = {
@@ -17,7 +16,7 @@ class TestAcidicWorkers < Minitest::Test
     }.freeze
     @valid_user = User.find_by(stripe_customer_id: "tok_visa")
     @invalid_user = User.find_by(stripe_customer_id: "tok_chargeCustomerFail")
-    @staged_job_params = [{ amount: 20_00, currency: "usd", user_id: @valid_user.id }.stringify_keys]
+    @staged_job_params = [{amount: 20_00, currency: "usd", user_id: @valid_user.id}.stringify_keys]
     @sidekiq_queue = Sidekiq::Queues["default"]
     if RideCreateWorker.respond_to?(:error_in_create_stripe_charge)
       RideCreateWorker.undef_method(:error_in_create_stripe_charge)
@@ -177,9 +176,9 @@ class TestAcidicWorkers < Minitest::Test
 
     def test_continues_from_recovery_point_create_stripe_charge
       ride = Ride.create(@valid_params.merge(
-                           user: @valid_user
-                         ))
-      key = create_key(recovery_point: :create_stripe_charge, attr_accessors: { ride: ride })
+        user: @valid_user
+      ))
+      key = create_key(recovery_point: :create_stripe_charge, attr_accessors: {ride: ride})
       AcidicJob::Key.stub(:find_by, ->(*) { key }) do
         result = RideCreateWorker.new.perform(@valid_user.id, @valid_params)
         assert_equal true, result

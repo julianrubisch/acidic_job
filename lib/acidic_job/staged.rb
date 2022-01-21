@@ -19,9 +19,8 @@ module AcidicJob
 
     private
 
-    # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     def enqueue_job
-      gid = { "staged_job_gid" => to_global_id.to_s }
+      gid = {"staged_job_gid" => to_global_id.to_s}
 
       if job_args.is_a?(Hash) && job_args.key?("arguments")
         job_args["arguments"].concat([gid])

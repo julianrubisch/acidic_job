@@ -5,7 +5,7 @@ require "sidekiq/testing"
 unless defined? Sidekiq::Batch
   module Sidekiq
     class Batch
-      class Status; end # rubocop:disable Lint/EmptyClass
+      class Status; end
     end
   end
 end
@@ -58,7 +58,6 @@ module Support
         0
       end
 
-      # rubocop:disable Metrics/MethodLength
       def join
         ::Sidekiq::Worker.drain_all
 

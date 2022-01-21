@@ -17,7 +17,6 @@ ActiveRecord::Base.establish_connection(
 
 GlobalID.app = :test
 
-# rubocop:disable Metrics/BlockLength
 ActiveRecord::Schema.define do
   create_table :acidic_job_keys, force: true do |t|
     t.string :idempotency_key, null: false
@@ -100,7 +99,7 @@ class Ride < ApplicationRecord
 end
 
 require "database_cleaner/active_record"
-DatabaseCleaner.strategy = [:deletion, { except: %w[users] }]
+DatabaseCleaner.strategy = [:deletion, {except: %w[users]}]
 DatabaseCleaner.clean
 
 # SEEDS ------------------------------------------------------------------------
@@ -112,7 +111,7 @@ USERS = [
 
 USERS.each do |(email, stripe_source)|
   User.create!(email: email,
-               stripe_customer_id: stripe_source)
+    stripe_customer_id: stripe_source)
 end
 
 # LOGGING ----------------------------------------------------------------------

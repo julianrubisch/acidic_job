@@ -29,7 +29,7 @@ class WorkerWithErrorInsidePhaseTransaction
   include AcidicJob
 
   def perform
-    with_acidity given: { accessor: nil } do
+    with_acidity given: {accessor: nil} do
       step :do_something
     end
   end
@@ -108,7 +108,7 @@ class TestEdgeCases < Minitest::Test
 
     assert_equal 1, AcidicJob::Key.count
     assert_equal CustomErrorForTesting, AcidicJob::Key.first.error_object.class
-    assert_equal AcidicJob::Key.first.attr_accessors, { "accessor" => nil }
+    assert_equal AcidicJob::Key.first.attr_accessors, {"accessor" => nil}
   end
 
   def test_logic_inside_acidic_block_is_executed_appropriately
@@ -122,15 +122,15 @@ class TestEdgeCases < Minitest::Test
 
     assert_equal 1, AcidicJob::Key.count
   end
-  
-  def test_logic_inside_acidic_block_is_executed_appropriately
+
+  def test_deprecated_syntax_is_executed_appropriately
     assert_raises CustomErrorForTesting do
       WorkerWithOldSyntax.new.perform
     end
-  
+
     assert_equal 1, AcidicJob::Key.count
   end
-  
+
   # def test_thing
   #   w = Worker.new
   #   w.perform rand(100)

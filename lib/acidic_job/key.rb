@@ -13,7 +13,7 @@ module AcidicJob
     serialize :workflow
     store :attr_accessors
 
-    validates :idempotency_key, presence: true, uniqueness: { scope: %i[job_name job_args] }
+    validates :idempotency_key, presence: true, uniqueness: {scope: %i[job_name job_args]}
     validates :job_name, presence: true
     validates :last_run_at, presence: true
     validates :recovery_point, presence: true
